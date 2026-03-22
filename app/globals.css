@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0b0b;
+  --bg2: #111111;
+  --bg3: #181818;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f2ede6;
+  --muted: #888888;
+  --red: #ff4422;
+  --red-dim: rgba(255, 68, 34, 0.12);
+  --red-glow: rgba(255, 68, 34, 0.25);
+}
+
+.light {
+  --bg: #ffffff;
+  --bg2: #f8f7f5;
+  --bg3: #f0eeeb;
+  --border: rgba(0, 0, 0, 0.08);
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --red: #e63b1a;
+  --red-dim: rgba(230, 59, 26, 0.12);
+  --red-glow: rgba(230, 59, 26, 0.25);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg2: var(--bg2);
+  --color-bg3: var(--bg3);
+  --color-border: var(--border);
+  --color-foreground: var(--text);
+  --color-muted: var(--muted);
+  --color-red: var(--red);
+  --color-red-dim: var(--red-dim);
+  --color-red-glow: var(--red-glow);
+  --font-display: var(--font-unbounded);
+  --font-serif: var(--font-lora);
+  --font-body: var(--font-figtree);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-figtree), sans-serif;
+}
+
+a,
+button,
+[role="button"],
+select,
+summary {
+  cursor: pointer;
+}
