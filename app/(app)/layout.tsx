@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { auth } from "@/lib/auth";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <Link href="/dashboard" className="text-sm text-muted hover:text-foreground transition-colors">
               Dashboard
             </Link>
+            <ThemeToggle />
             <span className="text-sm text-muted">
               {session.user.isLifetime ? (
                 <span className="text-green-400">Unlimited</span>

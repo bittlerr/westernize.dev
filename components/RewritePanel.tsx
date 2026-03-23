@@ -57,6 +57,7 @@ export function RewritePanel({
         <h3 className="text-sm font-medium">Rewritten Bullets</h3>
         {!readOnly && (
           <button
+            type="button"
             onClick={acceptAll}
             className="text-xs bg-red text-white px-3 py-1.5 rounded-lg hover:bg-red/90 transition-colors"
           >
@@ -101,6 +102,7 @@ export function RewritePanel({
               <div className="flex gap-2 mt-3 justify-end">
                 {editingIndex === i ? (
                   <button
+                    type="button"
                     onClick={() => {
                       update(i, { status: "edited" });
                       setEditingIndex(null);
@@ -112,18 +114,21 @@ export function RewritePanel({
                 ) : (
                   <>
                     <button
+                      type="button"
                       onClick={() => update(i, { status: "accepted" })}
                       className="text-xs px-3 py-1 rounded bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
                     >
                       Accept
                     </button>
                     <button
+                      type="button"
                       onClick={() => setEditingIndex(i)}
                       className="text-xs px-3 py-1 rounded bg-bg3 text-muted hover:text-foreground transition-colors"
                     >
                       Edit
                     </button>
                     <button
+                      type="button"
                       onClick={() => update(i, { status: "rejected" })}
                       className="text-xs px-3 py-1 rounded bg-red-dim text-red hover:bg-red/20 transition-colors"
                     >

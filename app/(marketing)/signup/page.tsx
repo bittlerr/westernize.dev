@@ -1,17 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignupPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,7 +29,27 @@ export default function SignupPage() {
       return;
     }
 
-    router.push("/optimize");
+    setSent(true);
+    setLoading(false);
+  }
+
+  if (sent) {
+    return (
+      <div className="flex-1 flex items-center justify-center px-6 py-20">
+        <div className="w-full max-w-sm text-center space-y-4">
+          <h1 className="font-display text-3xl font-bold">Check your email</h1>
+          <p className="text-muted">
+            We sent a verification link to <strong>{email}</strong>. Click it to activate your account.
+          </p>
+          <p className="text-sm text-muted">
+            Didn&apos;t receive it?{" "}
+            <button type="button" onClick={() => setSent(false)} className="text-red hover:underline">
+              Try again
+            </button>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

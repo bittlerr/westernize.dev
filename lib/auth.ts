@@ -2,7 +2,9 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import * as schema from "@/db/schema";
+import { logAudit } from "@/lib/audit";
 import { db } from "@/lib/db";
+import { sendResetPasswordEmail, sendVerificationEmail, sendWelcomeEmail } from "@/lib/email";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -10,8 +12,33 @@ export const auth = betterAuth({
     usePlural: true,
     schema,
   }),
+  rateLimit: {
+    window: 60,
+    max: 5,
+  },
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
+    async sendResetPassword({ user, url }) {
+      await sendResetPasswordEmail(user.email, url);
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    async sendVerificationEmail({ user, url }) {
+      await sendVerificationEmail(user.email, url);
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        async after(user) {
+          await sendWelcomeEmail(user.email, user.name ?? "");
+          await logAudit(user.id, "signup");
+        },
+      },
+    },
   },
   user: {
     additionalFields: {

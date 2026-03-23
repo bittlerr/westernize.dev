@@ -3,21 +3,38 @@
 import { useRef, useState } from "react";
 import type { OptimizationResult, SSEEvent } from "@/types";
 
-const STEPS = ["parsing", "analyzing", "rewriting", "done"] as const;
+const STEPS = [
+  { id: "parsing", label: "Parsing" },
+  { id: "analyzing", label: "Analyzing" },
+  { id: "rewriting", label: "Rewriting" },
+] as const;
+
+type InputMode = "paste" | "upload";
 
 export function OptimizeForm({ onComplete }: { onComplete: (result: OptimizationResult) => void }) {
   const [cvText, setCvText] = useState("");
   const [jdText, setJdText] = useState("");
+  const [inputMode, setInputMode] = useState<InputMode>("paste");
   const [pdfName, setPdfName] = useState("");
   const [fileId, setFileId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const [currentStep, setCurrentStep] = useState<string | null>(null);
   const [stepMessage, setStepMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const dragCounter = useRef(0);
 
   async function handlePdfUpload(file: File) {
+    if (!file.name.endsWith(".pdf")) {
+      setError("Only PDF files are accepted");
+
+      return;
+    }
+
     setError("");
+    setUploading(true);
     setPdfName(file.name);
 
     const form = new FormData();
@@ -30,15 +47,47 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
     if (!res.ok) {
       setError(data.error);
       setPdfName("");
+      setUploading(false);
 
       return;
     }
 
     setFileId(data.fileId);
-    setCvText(`[PDF uploaded: ${file.name} — ${data.pageCount} pages]`);
+    setCvText(`[PDF: ${file.name} — ${data.pageCount} pages]`);
+    setUploading(false);
   }
 
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  function handleDragEnter(e: React.DragEvent) {
+    e.preventDefault();
+    dragCounter.current++;
+    setDragging(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    dragCounter.current--;
+
+    if (dragCounter.current === 0) setDragging(false);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    dragCounter.current = 0;
+    setDragging(false);
+
+    const file = e.dataTransfer.files[0];
+
+    if (file) handlePdfUpload(file);
+  }
+
+  function clearPdf() {
+    setPdfName("");
+    setFileId(null);
+    setCvText("");
+    setInputMode("paste");
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -65,6 +114,9 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
       }
 
       const reader = res.body?.getReader();
+
+      if (!reader) throw new Error("No response body");
+
       const decoder = new TextDecoder();
       let buffer = "";
 
@@ -103,94 +155,203 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
     }
   }
 
+  const stepIndex = STEPS.findIndex((s) => s.id === currentStep);
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium mb-2">Your CV</label>
-        <div className="flex gap-3 mb-2">
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            className="text-xs px-3 py-1.5 rounded-lg border border-border hover:border-red text-muted hover:text-foreground transition-colors"
-          >
-            {pdfName || "Upload PDF"}
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".pdf"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handlePdfUpload(file);
-            }}
-          />
-          {pdfName && (
-            <button
-              type="button"
-              onClick={() => {
-                setPdfName("");
-                setFileId(null);
-                setCvText("");
-              }}
-              className="text-xs text-muted hover:text-red transition-colors"
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* CV INPUT */}
+        <div>
+          <div className="flex items-center justify-between mb-3 min-h-[32px]">
+            <label className="text-sm font-medium">Your CV</label>
+            {!fileId && (
+              <div className="flex rounded-lg border border-border overflow-hidden text-xs">
+                <button
+                  type="button"
+                  onClick={() => setInputMode("paste")}
+                  className={`px-3 py-1.5 transition-colors ${inputMode === "paste" ? "bg-bg3 text-foreground" : "text-muted hover:text-foreground"}`}
+                >
+                  Paste text
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInputMode("upload")}
+                  className={`px-3 py-1.5 transition-colors ${inputMode === "upload" ? "bg-bg3 text-foreground" : "text-muted hover:text-foreground"}`}
+                >
+                  Upload PDF
+                </button>
+              </div>
+            )}
+          </div>
+
+          {fileId ? (
+            <div className="h-64 rounded-lg border border-green-500/30 bg-green-500/5 flex flex-col items-center justify-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M5 10l3 3 7-7"
+                    stroke="#22c55e"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium">{pdfName}</p>
+                <p className="text-xs text-muted mt-1">PDF uploaded and parsed</p>
+              </div>
+              <button
+                type="button"
+                onClick={clearPdf}
+                className="text-xs text-muted hover:text-red transition-colors mt-1"
+              >
+                Remove
+              </button>
+            </div>
+          ) : inputMode === "upload" ? (
+            <label
+              onDragEnter={handleDragEnter}
+              onDragOver={(e) => e.preventDefault()}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`h-64 rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-3 transition-all cursor-pointer ${
+                dragging
+                  ? "border-red bg-red-dim scale-[1.02]"
+                  : uploading
+                    ? "border-border bg-bg2"
+                    : "border-border hover:border-red/50 hover:bg-bg2"
+              }`}
             >
-              Clear
-            </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handlePdfUpload(file);
+                }}
+              />
+              {uploading ? (
+                <>
+                  <div className="w-8 h-8 border-2 border-red border-t-transparent rounded-full animate-spin" />
+                  <p className="text-sm text-muted">Uploading {pdfName}...</p>
+                </>
+              ) : (
+                <>
+                  <div className="w-12 h-12 rounded-full bg-bg3 flex items-center justify-center">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path
+                        d="M10 3v10M6 7l4-4 4 4"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-muted"
+                      />
+                      <path
+                        d="M3 15h14"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        className="text-muted"
+                      />
+                    </svg>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm">
+                      <span className="text-red font-medium">Click to upload</span>
+                      <span className="text-muted"> or drag and drop</span>
+                    </p>
+                    <p className="text-xs text-muted mt-1">PDF up to 5MB (10MB for paid)</p>
+                  </div>
+                </>
+              )}
+            </label>
+          ) : (
+            <textarea
+              value={cvText}
+              onChange={(e) => setCvText(e.target.value)}
+              placeholder="Paste your full CV text here — work experience, skills, education..."
+              rows={10}
+              required={!fileId}
+              className="w-full h-64 rounded-lg border border-border bg-bg2 px-4 py-3 text-sm outline-none focus:border-red transition-colors resize-none"
+            />
           )}
         </div>
-        {!fileId && (
-          <textarea
-            value={cvText}
-            onChange={(e) => setCvText(e.target.value)}
-            placeholder="Paste your CV text here..."
-            rows={8}
-            required={!fileId}
-            className="w-full rounded-lg border border-border bg-bg2 px-4 py-3 text-sm outline-none focus:border-red transition-colors resize-none"
-          />
-        )}
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-2">Job Description</label>
-        <textarea
-          value={jdText}
-          onChange={(e) => setJdText(e.target.value)}
-          placeholder="Paste the job description here..."
-          rows={8}
-          required
-          className="w-full rounded-lg border border-border bg-bg2 px-4 py-3 text-sm outline-none focus:border-red transition-colors resize-none"
-        />
+        {/* JD INPUT */}
+        <div>
+          <div className="flex items-center justify-between mb-3 min-h-[32px]">
+            <label className="text-sm font-medium">Job Description</label>
+          </div>
+          <textarea
+            value={jdText}
+            onChange={(e) => setJdText(e.target.value)}
+            placeholder="Paste the full job posting — requirements, responsibilities, qualifications..."
+            rows={10}
+            required
+            className="w-full h-64 rounded-lg border border-border bg-bg2 px-4 py-3 text-sm outline-none focus:border-red transition-colors resize-none"
+          />
+        </div>
       </div>
 
       {error && <div className="bg-red-dim border border-red/20 text-red text-sm rounded-lg px-4 py-3">{error}</div>}
 
+      {/* PROGRESS STEPPER */}
       {loading && currentStep && (
-        <div className="flex items-center gap-4">
-          <div className="flex gap-1.5">
-            {STEPS.slice(0, -1).map((step) => (
-              <div
-                key={step}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  step === currentStep
-                    ? "bg-red animate-pulse"
-                    : STEPS.indexOf(step) < STEPS.indexOf(currentStep as (typeof STEPS)[number])
-                      ? "bg-green-400"
-                      : "bg-border"
-                }`}
-              />
+        <div className="border border-border rounded-lg p-6 bg-bg2">
+          <div className="flex items-center justify-between mb-4">
+            {STEPS.map((step, i) => (
+              <div key={step.id} className="flex items-center flex-1 last:flex-none">
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all ${
+                      i < stepIndex
+                        ? "bg-green-500/20 text-green-400"
+                        : i === stepIndex
+                          ? "bg-red text-white animate-pulse"
+                          : "bg-bg3 text-muted"
+                    }`}
+                  >
+                    {i < stepIndex ? "✓" : i + 1}
+                  </div>
+                  <span className={`text-xs mt-2 ${i === stepIndex ? "text-foreground font-medium" : "text-muted"}`}>
+                    {step.label}
+                  </span>
+                </div>
+                {i < STEPS.length - 1 && (
+                  <div className="flex-1 mx-3 mb-5">
+                    <div className="h-0.5 rounded-full bg-bg3 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          i < stepIndex ? "bg-green-400 w-full" : "bg-bg3 w-0"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
-          <p className="text-sm text-muted">{stepMessage}</p>
+          <p className="text-sm text-muted text-center">{stepMessage}</p>
         </div>
       )}
 
       <button
         type="submit"
-        disabled={loading || (!cvText && !fileId)}
-        className="w-full bg-red text-white font-medium rounded-lg px-4 py-3 text-sm hover:bg-red/90 transition-colors disabled:opacity-50"
+        disabled={loading || (!cvText && !fileId) || !jdText}
+        className="w-full bg-red text-white font-semibold rounded-lg px-4 py-3.5 text-sm hover:bg-red/90 transition-all disabled:opacity-50 disabled:hover:bg-red"
       >
-        {loading ? "Optimizing..." : "Optimize CV"}
+        {loading ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            Optimizing...
+          </span>
+        ) : (
+          "Westernize my CV"
+        )}
       </button>
     </form>
   );

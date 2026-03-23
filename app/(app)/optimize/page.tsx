@@ -19,6 +19,7 @@ export default function OptimizePage() {
 
   async function handleDownload() {
     if (!result) return;
+
     setDownloading(true);
 
     const res = await fetch("/api/export", {
@@ -35,6 +36,7 @@ export default function OptimizePage() {
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
+
       a.href = url;
       a.download = `${result.cvParsed.name.replace(/\s+/g, "_")}_westernized.docx`;
       a.click();
@@ -63,6 +65,7 @@ export default function OptimizePage() {
 
           <div className="flex gap-4">
             <button
+              type="button"
               onClick={handleDownload}
               disabled={downloading || acceptedBullets.length === 0}
               className="bg-red text-white font-medium rounded-lg px-6 py-3 text-sm hover:bg-red/90 transition-colors disabled:opacity-50"
@@ -70,6 +73,7 @@ export default function OptimizePage() {
               {downloading ? "Generating..." : "Download DOCX"}
             </button>
             <button
+              type="button"
               onClick={() => setResult(null)}
               className="border border-border rounded-lg px-6 py-3 text-sm text-muted hover:text-foreground hover:border-foreground/20 transition-colors"
             >

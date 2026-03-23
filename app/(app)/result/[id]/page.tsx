@@ -35,7 +35,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
 
       <div className="space-y-10">
         <div className="flex items-start gap-10">
-          <ScoreCard score={row.matchScore!} />
+          <ScoreCard score={row.matchScore ?? 0} />
           <div className="flex-1">
             <GapAnalysis data={gapAnalysis} />
           </div>
