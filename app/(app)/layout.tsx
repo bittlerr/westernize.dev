@@ -27,6 +27,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <Link href="/dashboard" className="text-sm text-muted hover:text-foreground transition-colors">
               Dashboard
             </Link>
+            {session.user.role === "admin" && (
+              <Link href="/admin" className="text-sm text-red hover:text-red/80 transition-colors">
+                Admin
+              </Link>
+            )}
             <ThemeToggle />
             <span className="text-sm text-muted">
               {session.user.isLifetime ? (

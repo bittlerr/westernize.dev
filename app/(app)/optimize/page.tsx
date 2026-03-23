@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { GapAnalysis } from "@/components/GapAnalysis";
 import { OptimizeForm } from "@/components/OptimizeForm";
@@ -8,14 +9,19 @@ import { ScoreCard } from "@/components/ScoreCard";
 import type { OptimizationResult } from "@/types";
 
 export default function OptimizePage() {
+  const router = useRouter();
   const [result, setResult] = useState<OptimizationResult | null>(null);
   const [acceptedBullets, setAcceptedBullets] = useState<string[]>([]);
   const [downloading, setDownloading] = useState(false);
 
-  const handleComplete = useCallback((r: OptimizationResult) => {
-    setResult(r);
-    setAcceptedBullets(r.rewrites.rewrites.map((b: { original: string; rewritten: string }) => b.rewritten));
-  }, []);
+  const handleComplete = useCallback(
+    (r: OptimizationResult) => {
+      setResult(r);
+      setAcceptedBullets(r.rewrites.rewrites.map((b: { original: string; rewritten: string }) => b.rewritten));
+      router.refresh();
+    },
+    [router],
+  );
 
   async function handleDownload() {
     if (!result) return;
