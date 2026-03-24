@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Figtree, Lora, Unbounded } from "next/font/google";
 import Script from "next/script";
 import { ThemeProvider } from "next-themes";
+import { Toasts } from "@/components/Toasts";
 import "./globals.css";
 
 const unbounded = Unbounded({
@@ -69,6 +70,7 @@ export default function RootLayout({
         )}
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
+          <Toasts />
         </ThemeProvider>
       </body>
     </html>

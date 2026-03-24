@@ -32,40 +32,25 @@ const plans = [
     hot: false,
   },
   {
-    tier: "Job Hunt Pack",
-    price: "$29",
-    desc: "15 optimizations. Apply to every role that fits.",
+    tier: "Hunt Pack",
+    price: "$49",
+    desc: "50 optimizations. Apply to every role that fits.",
     features: [
-      { text: "15 CV optimizations", included: true },
+      { text: "50 CV optimizations", included: true },
       { text: "DOCX export", included: true },
       { text: "Full gap analysis", included: true },
       { text: "Bullet-by-bullet rewrite", included: true },
       { text: "Priority AI queue", included: true },
     ],
-    cta: "Get job hunt pack — $29",
+    cta: "Get hunt pack — $49",
     href: "/signup?pack=hunt",
     hot: true,
-  },
-  {
-    tier: "Lifetime",
-    price: "$49",
-    desc: "Pay once, unlimited forever.",
-    features: [
-      { text: "Unlimited optimizations", included: true },
-      { text: "All future features", included: true },
-      { text: "No recurring charge", included: true },
-      { text: "DOCX export", included: true },
-      { text: "Priority AI queue", included: true },
-    ],
-    cta: "Get lifetime — $49",
-    href: "/signup?pack=lifetime",
-    hot: false,
   },
 ];
 
 export function PricingCards() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {plans.map((plan) => (
         <div
           key={plan.tier}

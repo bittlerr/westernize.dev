@@ -338,36 +338,19 @@ export default function LandingPage() {
 
           <div className={s.planHot}>
             <div className={s.planTag}>Best value</div>
-            <div className={s.planTier}>Job hunt pack</div>
-            <div className={s.planPrice}>$29</div>
-            <div className={s.planDesc}>15 optimizations for a serious job search. Apply to every role that fits.</div>
+            <div className={s.planTier}>Hunt pack</div>
+            <div className={s.planPrice}>$49</div>
+            <div className={s.planDesc}>50 optimizations for a serious job search. Apply to every role that fits.</div>
             <div className={s.planDivider} />
             <ul className={s.planFeatures}>
-              <li className={s.planFeatureYes}>15 CV optimizations</li>
+              <li className={s.planFeatureYes}>50 CV optimizations</li>
               <li className={s.planFeatureYes}>DOCX export</li>
               <li className={s.planFeatureYes}>Full gap analysis</li>
               <li className={s.planFeatureYes}>Bullet-by-bullet rewrite</li>
               <li className={s.planFeatureYes}>Priority AI queue</li>
             </ul>
             <Link href="/signup?pack=hunt" className={s.btnRed} style={{ width: "100%" }}>
-              Get job hunt pack — $29
-            </Link>
-          </div>
-
-          <div className={s.plan}>
-            <div className={s.planTier}>Lifetime</div>
-            <div className={s.planPrice}>$49</div>
-            <div className={s.planDesc}>Pay once, unlimited forever. Best for a focused job search sprint.</div>
-            <div className={s.planDivider} />
-            <ul className={s.planFeatures}>
-              <li className={s.planFeatureYes}>Unlimited optimizations</li>
-              <li className={s.planFeatureYes}>No recurring charge</li>
-              <li className={s.planFeatureYes}>All future features</li>
-              <li className={s.planFeatureYes}>DOCX export</li>
-              <li className={s.planFeatureYes}>Priority AI queue</li>
-            </ul>
-            <Link href="/signup?pack=lifetime" className={s.btnOutline} style={{ width: "100%" }}>
-              Get lifetime — $49
+              Get hunt pack — $49
             </Link>
           </div>
         </div>

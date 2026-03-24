@@ -1,6 +1,5 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { claude } from "@/lib/claude";
 import { validatePdf } from "@/lib/pdf";
 
 export async function POST(request: Request) {
@@ -27,12 +26,10 @@ export async function POST(request: Request) {
     return Response.json({ error: validation.error }, { status: 400 });
   }
 
-  const uploaded = await claude.beta.files.upload({
-    file: new File([buffer], file.name, { type: "application/pdf" }),
-  });
+  const pdfBase64 = buffer.toString("base64");
 
   return Response.json({
-    fileId: uploaded.id,
+    pdfBase64,
     pageCount: validation.pageCount,
   });
 }

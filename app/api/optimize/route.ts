@@ -1,3 +1,4 @@
+import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -22,8 +23,20 @@ import {
 
 const MAX_RETRIES = 3;
 
+const NON_RETRYABLE_STATUSES = new Set([400, 401, 403, 404]);
+
 function sseEncode(event: SSEEvent): string {
   return `data: ${JSON.stringify(event)}\n\n`;
+}
+
+function userMessage(err: unknown): string {
+  if (err instanceof Anthropic.APIError) {
+    if (err.status === 401 || err.status === 403) return "AI service authentication error. Please contact support.";
+    if (err.status === 429) return "AI service is busy. Please try again in a moment.";
+    if (err.status === 400) return "Invalid request to AI service. Please try different input.";
+  }
+
+  return "Something went wrong. Please try again.";
 }
 
 async function runStep<T>(fn: () => Promise<T>, retries = MAX_RETRIES): Promise<T> {
@@ -31,6 +44,9 @@ async function runStep<T>(fn: () => Promise<T>, retries = MAX_RETRIES): Promise<
     try {
       return await fn();
     } catch (e) {
+      console.error(`[optimize] attempt ${i + 1}/${retries} failed:`, e);
+
+      if (e instanceof Anthropic.APIError && NON_RETRYABLE_STATUSES.has(e.status)) throw e;
       if (i === retries - 1) throw e;
 
       await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
@@ -65,10 +81,10 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { cvText, jdText, fileId } = body as {
+  const { cvText, jdText, pdfBase64 } = body as {
     cvText: string;
     jdText: string;
-    fileId?: string;
+    pdfBase64?: string;
   };
 
   if (!cvText || !jdText) {
@@ -104,12 +120,15 @@ export async function POST(request: Request) {
 
         await db.update(optimizations).set({ status: "parsing" }).where(eq(optimizations.id, row.id));
 
-        const cvContent: Array<{ type: "text"; text: string } | { type: "file"; file_id: string }> = fileId
+        const cvContent = pdfBase64
           ? [
-              { type: "file", file_id: fileId },
-              { type: "text", text: "Extract the structured CV data from this PDF." },
+              {
+                type: "document" as const,
+                source: { type: "base64" as const, media_type: "application/pdf" as const, data: pdfBase64 },
+              },
+              { type: "text" as const, text: "Extract the structured CV data from this PDF." },
             ]
-          : [{ type: "text", text: cvText }];
+          : [{ type: "text" as const, text: cvText }];
 
         const [cvResult, jdResult] = await Promise.all([
           runStep(() =>
@@ -117,8 +136,8 @@ export async function POST(request: Request) {
               model: MODEL,
               max_tokens: 4096,
               system: "You are a CV parser. Extract structured data from the CV. Be thorough and accurate.",
-              messages: [{ role: "user", content: cvContent as never }],
-              output_format: zodOutputFormat(CvParsedSchema),
+              messages: [{ role: "user", content: cvContent }],
+              output_config: { format: zodOutputFormat(CvParsedSchema) },
             }),
           ),
           runStep(() =>
@@ -127,7 +146,7 @@ export async function POST(request: Request) {
               max_tokens: 2048,
               system: "You are a job description parser. Extract structured requirements from the job posting.",
               messages: [{ role: "user", content: jdText }],
-              output_format: zodOutputFormat(JdParsedSchema),
+              output_config: { format: zodOutputFormat(JdParsedSchema) },
             }),
           ),
         ]);
@@ -156,7 +175,7 @@ export async function POST(request: Request) {
                 content: `CV:\n${JSON.stringify(cvParsed)}\n\nJob Description:\n${JSON.stringify(jdParsed)}`,
               },
             ],
-            output_format: zodOutputFormat(GapAnalysisSchema),
+            output_config: { format: zodOutputFormat(GapAnalysisSchema) },
           }),
         );
 
@@ -185,7 +204,7 @@ export async function POST(request: Request) {
                 content: `CV bullets to rewrite:\n${JSON.stringify(cvParsed?.experience)}\n\nJob requirements:\n${JSON.stringify(jdParsed)}\n\nGap analysis:\n${JSON.stringify(gapAnalysis)}`,
               },
             ],
-            output_format: zodOutputFormat(RewritesSchema),
+            output_config: { format: zodOutputFormat(RewritesSchema) },
           }),
         );
 
@@ -223,8 +242,10 @@ export async function POST(request: Request) {
             },
           }),
         );
-      } catch {
+      } catch (err) {
         const failedStep = !cvParsed || !jdParsed ? "parsing" : !gapAnalysis ? "analyzing" : "rewriting";
+
+        console.error(`[optimize] failed at ${failedStep}:`, err);
 
         await db.update(optimizations).set({ status: "error" }).where(eq(optimizations.id, row.id));
 
@@ -232,6 +253,7 @@ export async function POST(request: Request) {
           sseEncode({
             step: "error",
             failedStep,
+            message: userMessage(err),
             partialResult:
               cvParsed && jdParsed
                 ? {

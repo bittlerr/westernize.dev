@@ -14,8 +14,8 @@ export default function TermsPage() {
 
         <h2>Credits</h2>
         <p>
-          Free accounts receive 1 optimization credit. Additional credits can be purchased. Lifetime plans provide
-          unlimited optimizations. Credits are non-refundable and non-transferable.
+          Free accounts receive 3 optimization credits. Additional credits can be purchased in packs. Credits are
+          non-refundable and non-transferable.
         </p>
 
         <h2>Acceptable use</h2>

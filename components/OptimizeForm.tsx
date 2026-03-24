@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import type { OptimizationResult, SSEEvent } from "@/types";
 
 const STEPS = [
@@ -16,24 +17,22 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
   const [jdText, setJdText] = useState("");
   const [inputMode, setInputMode] = useState<InputMode>("paste");
   const [pdfName, setPdfName] = useState("");
-  const [fileId, setFileId] = useState<string | null>(null);
+  const [pdfBase64, setPdfBase64] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [currentStep, setCurrentStep] = useState<string | null>(null);
   const [stepMessage, setStepMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const dragCounter = useRef(0);
 
   async function handlePdfUpload(file: File) {
     if (!file.name.endsWith(".pdf")) {
-      setError("Only PDF files are accepted");
+      toast.error("Only PDF files are accepted");
 
       return;
     }
 
-    setError("");
     setUploading(true);
     setPdfName(file.name);
 
@@ -41,20 +40,29 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
 
     form.append("file", file);
 
-    const res = await fetch("/api/parse-pdf", { method: "POST", body: form });
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/parse-pdf", { method: "POST", body: form });
 
-    if (!res.ok) {
-      setError(data.error);
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+
+        toast.error(data?.error || "Upload failed. Please try again.");
+        setPdfName("");
+
+        return;
+      }
+
+      const data = await res.json();
+
+      setPdfBase64(data.pdfBase64);
+      setCvText(`[PDF: ${file.name} — ${data.pageCount} pages]`);
+    } catch {
+      toast.error("Connection error. Please try again.");
       setPdfName("");
+    } finally {
       setUploading(false);
-
-      return;
+      if (fileRef.current) fileRef.current.value = "";
     }
-
-    setFileId(data.fileId);
-    setCvText(`[PDF: ${file.name} — ${data.pageCount} pages]`);
-    setUploading(false);
   }
 
   function handleDragEnter(e: React.DragEvent) {
@@ -82,14 +90,13 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
 
   function clearPdf() {
     setPdfName("");
-    setFileId(null);
+    setPdfBase64(null);
     setCvText("");
     setInputMode("paste");
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
     setLoading(true);
     setCurrentStep(null);
 
@@ -100,14 +107,14 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
         body: JSON.stringify({
           cvText,
           jdText,
-          ...(fileId ? { fileId } : {}),
+          ...(pdfBase64 ? { pdfBase64 } : {}),
         }),
       });
 
       if (!res.ok) {
         const data = await res.json();
 
-        setError(data.error);
+        toast.error(data.error);
         setLoading(false);
 
         return;
@@ -119,6 +126,7 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
 
       const decoder = new TextDecoder();
       let buffer = "";
+      let finished = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -139,17 +147,27 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
           const event: SSEEvent = JSON.parse(data);
 
           if (event.step === "done") {
+            finished = true;
             onComplete(event.result);
           } else if (event.step === "error") {
-            setError(`Failed at ${event.failedStep} step`);
+            finished = true;
+            setCurrentStep(null);
+            toast.error(event.message);
           } else {
             setCurrentStep(event.step);
             setStepMessage(event.message);
           }
         }
+
+        if (finished) break;
+      }
+
+      if (!finished) {
+        toast.error("Connection lost. Please try again.");
+        setCurrentStep(null);
       }
     } catch {
-      setError("Connection error. Please try again.");
+      toast.error("Connection error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -164,7 +182,7 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
         <div>
           <div className="flex items-center justify-between mb-3 min-h-[32px]">
             <label className="text-sm font-medium">Your CV</label>
-            {!fileId && (
+            {!pdfBase64 && (
               <div className="flex rounded-lg border border-border overflow-hidden text-xs">
                 <button
                   type="button"
@@ -184,7 +202,7 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
             )}
           </div>
 
-          {fileId ? (
+          {pdfBase64 ? (
             <div className="h-64 rounded-lg border border-green-500/30 bg-green-500/5 flex flex-col items-center justify-center gap-3">
               <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -275,7 +293,7 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
               onChange={(e) => setCvText(e.target.value)}
               placeholder="Paste your full CV text here — work experience, skills, education..."
               rows={10}
-              required={!fileId}
+              required={!pdfBase64}
               className="w-full h-64 rounded-lg border border-border bg-bg2 px-4 py-3 text-sm outline-none focus:border-red transition-colors resize-none"
             />
           )}
@@ -296,8 +314,6 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
           />
         </div>
       </div>
-
-      {error && <div className="bg-red-dim border border-red/20 text-red text-sm rounded-lg px-4 py-3">{error}</div>}
 
       {/* PROGRESS STEPPER */}
       {loading && currentStep && (
@@ -341,7 +357,7 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
 
       <button
         type="submit"
-        disabled={loading || (!cvText && !fileId) || !jdText}
+        disabled={loading || (!cvText && !pdfBase64) || !jdText}
         className="w-full bg-red text-white font-semibold rounded-lg px-4 py-3.5 text-sm hover:bg-red/90 transition-all disabled:opacity-50 disabled:hover:bg-red"
       >
         {loading ? (

@@ -21,6 +21,7 @@ export default function SignupPage() {
       name,
       email,
       password,
+      callbackURL: "/verified",
     });
 
     if (error) {

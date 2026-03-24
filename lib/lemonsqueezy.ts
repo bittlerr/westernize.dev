@@ -1,9 +1,8 @@
 import crypto from "node:crypto";
 
-export const VARIANT_CREDITS: Record<string, number | "lifetime"> = {
+export const VARIANT_CREDITS: Record<string, number> = {
   [process.env.LEMONSQUEEZY_VARIANT_STARTER ?? "starter"]: 5,
-  [process.env.LEMONSQUEEZY_VARIANT_HUNT ?? "hunt"]: 15,
-  [process.env.LEMONSQUEEZY_VARIANT_LIFETIME ?? "lifetime"]: "lifetime",
+  [process.env.LEMONSQUEEZY_VARIANT_HUNT ?? "hunt"]: 50,
 };
 
 export function verifyWebhookSignature(rawBody: string, signature: string): boolean {

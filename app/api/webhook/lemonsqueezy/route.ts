@@ -38,21 +38,13 @@ export async function POST(request: Request) {
 
   const credits = VARIANT_CREDITS[variantId];
 
-  if (credits === "lifetime") {
-    await db.update(users).set({ isLifetime: true }).where(eq(users.id, user.id));
-
-    await logAudit(user.id, "credits.purchased", {
-      type: "lifetime",
-      variantId,
-    });
-  } else if (typeof credits === "number") {
+  if (typeof credits === "number") {
     await db
       .update(users)
       .set({ credits: sql`${users.credits} + ${credits}` })
       .where(eq(users.id, user.id));
 
     await logAudit(user.id, "credits.purchased", {
-      type: "credits",
       amount: credits,
       variantId,
     });

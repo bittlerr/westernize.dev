@@ -18,7 +18,7 @@ export type SSEEvent =
   | { step: "analyzing"; message: string }
   | { step: "rewriting"; message: string }
   | { step: "done"; result: OptimizationResult }
-  | { step: "error"; failedStep: string; partialResult: Partial<OptimizationResult> | null };
+  | { step: "error"; failedStep: string; message: string; partialResult: Partial<OptimizationResult> | null };
 
 export interface OptimizationResult {
   id: string;
