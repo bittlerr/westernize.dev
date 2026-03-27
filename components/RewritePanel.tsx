@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Rewrites } from "@/types";
 
 type BulletStatus = "pending" | "accepted" | "rejected" | "edited";
@@ -12,6 +12,11 @@ interface BulletState {
   editedText: string;
 }
 
+export interface AcceptedBullet {
+  index: number;
+  text: string;
+}
+
 export function RewritePanel({
   data,
   readOnly = false,
@@ -19,7 +24,7 @@ export function RewritePanel({
 }: {
   data: Rewrites;
   readOnly?: boolean;
-  onAcceptedChange?: (bullets: string[]) => void;
+  onAcceptedChange?: (bullets: AcceptedBullet[]) => void;
 }) {
   const [bullets, setBullets] = useState<BulletState[]>(
     data.rewrites.map((r) => ({
@@ -30,25 +35,27 @@ export function RewritePanel({
   );
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
+  useEffect(() => {
+    onAcceptedChange?.(
+      bullets
+        .map((b, i) => ({ index: i, text: b.editedText, status: b.status }))
+        .filter((b) => b.status === "accepted" || b.status === "edited")
+        .map(({ index, text }) => ({ index, text })),
+    );
+  }, [bullets, onAcceptedChange]);
+
   function update(index: number, patch: Partial<BulletState>) {
     setBullets((prev) => {
       const next = [...prev];
 
       next[index] = { ...next[index], ...patch };
-      onAcceptedChange?.(next.filter((b) => b.status === "accepted" || b.status === "edited").map((b) => b.editedText));
 
       return next;
     });
   }
 
   function acceptAll() {
-    setBullets((prev) => {
-      const next = prev.map((b) => ({ ...b, status: "accepted" as const }));
-
-      onAcceptedChange?.(next.map((b) => b.editedText));
-
-      return next;
-    });
+    setBullets((prev) => prev.map((b) => ({ ...b, status: "accepted" as const })));
   }
 
   return (
@@ -74,17 +81,24 @@ export function RewritePanel({
               bullet.status === "accepted" || bullet.status === "edited"
                 ? "border-green-500/30 bg-green-500/5"
                 : bullet.status === "rejected"
-                  ? "border-red/30 bg-red-dim opacity-50"
+                  ? "border-red/30 bg-red/5"
                   : "border-border"
             }`}
           >
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-muted mb-1">Original</p>
-                <p className="text-sm leading-relaxed">{bullet.original}</p>
+                <p
+                  className={`text-sm leading-relaxed ${bullet.status === "accepted" || bullet.status === "edited" ? "text-muted line-through" : ""}`}
+                >
+                  {bullet.original}
+                </p>
               </div>
               <div>
-                <p className="text-xs text-muted mb-1">Rewritten</p>
+                <p className="text-xs text-muted mb-1">
+                  Rewritten
+                  {bullet.status === "edited" && <span className="ml-1 text-green-400">(edited)</span>}
+                </p>
                 {editingIndex === i ? (
                   <textarea
                     value={bullet.editedText}
@@ -93,7 +107,11 @@ export function RewritePanel({
                     rows={3}
                   />
                 ) : (
-                  <p className="text-sm leading-relaxed">{bullet.editedText}</p>
+                  <p
+                    className={`text-sm leading-relaxed ${bullet.status === "rejected" ? "text-muted line-through" : ""}`}
+                  >
+                    {bullet.editedText}
+                  </p>
                 )}
               </div>
             </div>
@@ -111,26 +129,42 @@ export function RewritePanel({
                   >
                     Save
                   </button>
+                ) : bullet.status === "accepted" || bullet.status === "edited" ? (
+                  <button
+                    type="button"
+                    onClick={() => update(i, { status: "pending" })}
+                    className="text-xs px-3 py-1 rounded bg-bg3 text-muted hover:text-foreground transition-colors"
+                  >
+                    Undo
+                  </button>
+                ) : bullet.status === "rejected" ? (
+                  <button
+                    type="button"
+                    onClick={() => update(i, { status: "pending" })}
+                    className="text-xs px-3 py-1 rounded bg-bg3 text-muted hover:text-foreground transition-colors"
+                  >
+                    Undo
+                  </button>
                 ) : (
                   <>
                     <button
                       type="button"
                       onClick={() => update(i, { status: "accepted" })}
-                      className="text-xs px-3 py-1 rounded bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
+                      className="text-xs px-3 py-1.5 rounded border border-green-500/30 text-green-400 hover:bg-green-500/10 transition-colors"
                     >
                       Accept
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditingIndex(i)}
-                      className="text-xs px-3 py-1 rounded bg-bg3 text-muted hover:text-foreground transition-colors"
+                      className="text-xs px-3 py-1.5 rounded border border-border text-muted hover:text-foreground hover:border-foreground/20 transition-colors"
                     >
                       Edit
                     </button>
                     <button
                       type="button"
                       onClick={() => update(i, { status: "rejected" })}
-                      className="text-xs px-3 py-1 rounded bg-red-dim text-red hover:bg-red/20 transition-colors"
+                      className="text-xs px-3 py-1.5 rounded border border-red/30 text-red hover:bg-red/10 transition-colors"
                     >
                       Reject
                     </button>

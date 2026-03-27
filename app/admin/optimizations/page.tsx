@@ -22,6 +22,8 @@ export default async function AdminOptimizationsPage({
       status: optimizations.status,
       matchScore: optimizations.matchScore,
       jdParsed: optimizations.jdParsed,
+      rating: optimizations.rating,
+      feedback: optimizations.feedback,
       createdAt: optimizations.createdAt,
     })
     .from(optimizations)
@@ -63,6 +65,7 @@ export default async function AdminOptimizationsPage({
               <th className="text-left px-4 py-3 font-medium text-muted">User</th>
               <th className="text-left px-4 py-3 font-medium text-muted">Role</th>
               <th className="text-left px-4 py-3 font-medium text-muted">Score</th>
+              <th className="text-left px-4 py-3 font-medium text-muted">Rating</th>
               <th className="text-left px-4 py-3 font-medium text-muted">Status</th>
             </tr>
           </thead>
@@ -83,6 +86,16 @@ export default async function AdminOptimizationsPage({
                   </td>
                   <td className="px-4 py-3">{jd?.role ?? "—"}</td>
                   <td className="px-4 py-3">{row.matchScore != null ? `${row.matchScore}%` : "—"}</td>
+                  <td className="px-4 py-3">
+                    {row.rating ? (
+                      <span className="cursor-default" title={row.feedback || undefined}>
+                        {"★".repeat(row.rating)}
+                        {"☆".repeat(5 - row.rating)}
+                      </span>
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full ${

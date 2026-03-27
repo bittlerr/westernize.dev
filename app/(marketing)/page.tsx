@@ -1,4 +1,6 @@
+import { headers } from "next/headers";
 import Link from "next/link";
+import { auth } from "@/lib/auth";
 import s from "./page.module.css";
 
 const TICKER_ITEMS = [
@@ -16,9 +18,59 @@ export const metadata = {
     "Upload your CV and job description. Get a match score, gap analysis, and AI-rewritten bullet points optimized for Western tech companies.",
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const loggedIn = !!session;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "Westernize",
+        url: "https://westernize.dev",
+        logo: "https://westernize.dev/icon.svg",
+        description: "AI-powered CV optimization for Eastern European developers targeting Western tech companies.",
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "Westernize",
+        url: "https://westernize.dev",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        description:
+          "Upload your CV and job description. Get a match score, gap analysis, and AI-rewritten bullet points optimized for Western tech companies.",
+        offers: [
+          {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+            name: "Free",
+            description: "3 CV optimizations",
+          },
+          {
+            "@type": "Offer",
+            price: "12",
+            priceCurrency: "USD",
+            name: "Starter Pack",
+            description: "5 CV optimizations",
+          },
+          {
+            "@type": "Offer",
+            price: "49",
+            priceCurrency: "USD",
+            name: "Hunt Pack",
+            description: "50 CV optimizations",
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <>
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       {/* HERO */}
       <section className={s.hero}>
         <div className={s.heroEyebrow}>For developers from Eastern Europe</div>
@@ -44,11 +96,11 @@ export default function LandingPage() {
         </p>
 
         <div className={s.heroCtas}>
-          <Link href="/signup" className={s.btnRed}>
-            Westernize my CV — it&apos;s free
+          <Link href={loggedIn ? "/optimize" : "/signup"} className={s.btnRed}>
+            {loggedIn ? "Westernize my CV" : "Westernize my CV — it\u2019s free"}
           </Link>
-          <a href="#how" className={s.btnOutline}>
-            See how it works
+          <a href={loggedIn ? "/dashboard" : "#how"} className={s.btnOutline}>
+            {loggedIn ? "Go to dashboard" : "See how it works"}
           </a>
         </div>
 
@@ -311,11 +363,11 @@ export default function LandingPage() {
               <li className={s.planFeatureYes}>3 CV optimizations</li>
               <li className={s.planFeatureYes}>ATS match score</li>
               <li className={s.planFeatureYes}>Gap analysis</li>
-              <li className={s.planFeatureYes}>Rewrite preview</li>
-              <li className={s.planFeatureDim}>DOCX export</li>
+              <li className={s.planFeatureYes}>Bullet-by-bullet rewrite</li>
+              <li className={s.planFeatureYes}>DOCX export</li>
             </ul>
-            <Link href="/signup" className={s.btnOutline} style={{ width: "100%" }}>
-              Start free
+            <Link href={loggedIn ? "/optimize" : "/signup"} className={s.btnOutline} style={{ width: "100%" }}>
+              {loggedIn ? "Optimize now" : "Start free"}
             </Link>
           </div>
 
@@ -331,8 +383,8 @@ export default function LandingPage() {
               <li className={s.planFeatureYes}>Bullet-by-bullet rewrite</li>
               <li className={s.planFeatureDim}>Priority AI queue</li>
             </ul>
-            <Link href="/signup?pack=starter" className={s.btnRed} style={{ width: "100%" }}>
-              Get started — $12
+            <Link href={loggedIn ? "/optimize" : "/signup?pack=starter"} className={s.btnRed} style={{ width: "100%" }}>
+              {loggedIn ? "Optimize now" : "Get started — $12"}
             </Link>
           </div>
 
@@ -349,8 +401,8 @@ export default function LandingPage() {
               <li className={s.planFeatureYes}>Bullet-by-bullet rewrite</li>
               <li className={s.planFeatureYes}>Priority AI queue</li>
             </ul>
-            <Link href="/signup?pack=hunt" className={s.btnRed} style={{ width: "100%" }}>
-              Get hunt pack — $49
+            <Link href={loggedIn ? "/optimize" : "/signup?pack=hunt"} className={s.btnRed} style={{ width: "100%" }}>
+              {loggedIn ? "Optimize now" : "Get hunt pack — $49"}
             </Link>
           </div>
         </div>
@@ -364,10 +416,14 @@ export default function LandingPage() {
           <em>one rewrite away.</em>
         </h2>
         <p style={{ color: "var(--muted)", fontSize: 16, marginBottom: 44 }}>
-          Free to start. No credit card. Takes 5 minutes.
+          {loggedIn ? "Your next optimization is one click away." : "Free to start. No credit card. Takes 5 minutes."}
         </p>
-        <Link href="/signup" className={s.btnRed} style={{ fontSize: 16, padding: "17px 40px" }}>
-          Westernize my CV →
+        <Link
+          href={loggedIn ? "/optimize" : "/signup"}
+          className={s.btnRed}
+          style={{ fontSize: 16, padding: "17px 40px" }}
+        >
+          {loggedIn ? "Optimize my CV \u2192" : "Westernize my CV \u2192"}
         </Link>
       </div>
     </>

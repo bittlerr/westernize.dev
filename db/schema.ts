@@ -81,5 +81,7 @@ export const optimizations = pgTable("optimizations", {
   matchScore: integer("match_score"),
   status: text("status").default("pending").notNull(),
   tokenUsage: jsonb("token_usage"),
+  rating: integer("rating"),
+  feedback: text("feedback"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });

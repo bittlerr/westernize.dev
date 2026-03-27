@@ -1,7 +1,13 @@
+import { headers } from "next/headers";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { auth } from "@/lib/auth";
 
-export default function MarketingLayout({ children }: { children: React.ReactNode }) {
+export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   return (
     <div className="min-h-screen flex flex-col">
       <nav className="border-b border-border bg-bg/80 backdrop-blur-sm sticky top-0 z-50">
@@ -26,15 +32,26 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
               Testimonials
             </Link>
             <ThemeToggle />
-            <Link href="/login" className="text-xs sm:text-sm text-muted hover:text-foreground transition-colors">
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="text-xs sm:text-sm bg-red text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-red/90 transition-colors"
-            >
-              Sign up free
-            </Link>
+            {session ? (
+              <Link
+                href="/dashboard"
+                className="text-xs sm:text-sm bg-red text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-red/90 transition-colors"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="text-xs sm:text-sm text-muted hover:text-foreground transition-colors">
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="text-xs sm:text-sm bg-red text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-red/90 transition-colors"
+                >
+                  Sign up free
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>

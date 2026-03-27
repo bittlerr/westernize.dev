@@ -1,13 +1,14 @@
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import { FeedbackForm } from "@/components/FeedbackForm";
 import { GapAnalysis } from "@/components/GapAnalysis";
-import { RewritePanel } from "@/components/RewritePanel";
+import { ResultActions } from "@/components/ResultActions";
 import { ScoreCard } from "@/components/ScoreCard";
 import { optimizations } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import type { GapAnalysis as GapAnalysisType, Rewrites } from "@/types";
+import type { CvParsed, GapAnalysis as GapAnalysisType, Rewrites } from "@/types";
 
 export default async function ResultPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -26,6 +27,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
 
   if (!row || row.status !== "done") notFound();
 
+  const cvParsed = row.cvParsed as CvParsed;
   const gapAnalysis = row.gapAnalysis as GapAnalysisType;
   const rewrites = row.rewrites as Rewrites;
 
@@ -41,7 +43,9 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
 
-        <RewritePanel data={rewrites} readOnly />
+        <ResultActions optimizationId={row.id} rewrites={rewrites} cvParsed={cvParsed} />
+
+        <FeedbackForm optimizationId={row.id} existingRating={row.rating} />
       </div>
     </div>
   );
