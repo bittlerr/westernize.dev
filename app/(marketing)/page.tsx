@@ -29,14 +29,14 @@ export default async function LandingPage() {
       {
         "@type": "Organization",
         name: "Westernize",
-        url: "https://westernize.dev",
-        logo: "https://westernize.dev/icon.svg",
+        url: "https://www.westernize.dev",
+        logo: "https://www.westernize.dev/icon.svg",
         description: "AI-powered CV optimization for Eastern European developers targeting Western tech companies.",
       },
       {
         "@type": "SoftwareApplication",
         name: "Westernize",
-        url: "https://westernize.dev",
+        url: "https://www.westernize.dev",
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         description:

@@ -1,7 +1,11 @@
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   serverExternalPackages: ["pdf-parse"],
 };
 
-export default nextConfig;
+const withMDX = createMDX({});
+
+export default withMDX(nextConfig);

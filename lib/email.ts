@@ -40,7 +40,7 @@ export async function sendWelcomeEmail(email: string, name: string) {
         You've got 3 free CV optimizations ready to go. Upload your CV and a job description,
         and we'll show you exactly what Western tech companies want to see.
       </p>
-      ${button("https://westernize.dev/optimize", "Optimize my CV")}
+      ${button("https://www.westernize.dev/optimize", "Optimize my CV")}
       <p style="color: #999; font-size: 13px; margin-top: 32px;">
         — The Westernize team
       </p>

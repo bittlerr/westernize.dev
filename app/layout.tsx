@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   description:
     "AI-powered CV optimization for Eastern European developers targeting Western tech companies. Get ATS-friendly, westernized bullet points in minutes.",
-  metadataBase: new URL(process.env.BETTER_AUTH_URL ?? "https://westernize.dev"),
+  metadataBase: new URL(process.env.BETTER_AUTH_URL ?? "https://www.westernize.dev"),
   openGraph: {
     title: "Westernize — Rebuild your CV for Western tech",
     description:

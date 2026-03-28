@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.BETTER_AUTH_URL ?? "https://westernize.dev";
+const BASE_URL = process.env.BETTER_AUTH_URL ?? "https://www.westernize.dev";
 
 export default function robots(): MetadataRoute.Robots {
   return {

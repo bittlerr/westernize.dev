@@ -31,6 +31,9 @@ export default async function MarketingLayout({ children }: { children: React.Re
             >
               Testimonials
             </Link>
+            <Link href="/blog" className="text-sm text-muted hover:text-foreground transition-colors hidden md:block">
+              Blog
+            </Link>
             <ThemeToggle />
             {session ? (
               <Link
