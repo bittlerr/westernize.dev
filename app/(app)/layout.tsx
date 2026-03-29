@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AppNavMenu } from "@/components/AppNavMenu";
+import { CreditsBadge } from "@/components/CreditsBadge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { auth } from "@/lib/auth";
 
@@ -16,11 +18,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen flex flex-col">
       <nav className="border-b border-border bg-bg2">
-        <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="font-display text-xl font-bold tracking-tight text-red">
+        <div className="relative mx-auto max-w-6xl flex items-center justify-between px-4 md:px-6 py-3 md:py-4">
+          <Link href="/dashboard" className="font-display text-lg md:text-xl font-bold tracking-tight text-red">
             WESTERNIZE
           </Link>
-          <div className="flex items-center gap-6">
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-6">
             <Link href="/optimize" className="text-sm text-muted hover:text-foreground transition-colors">
               Optimize
             </Link>
@@ -33,15 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               </Link>
             )}
             <ThemeToggle />
-            <span className="text-sm text-muted">
-              {session.user.isLifetime ? (
-                <span className="text-green-400">Unlimited</span>
-              ) : (
-                <>
-                  {session.user.credits} credit{session.user.credits !== 1 ? "s" : ""}
-                </>
-              )}
-            </span>
+            <CreditsBadge />
             <form
               action={async () => {
                 "use server";
@@ -54,6 +49,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 Log out
               </button>
             </form>
+          </div>
+          {/* Mobile nav */}
+          <div className="flex md:hidden items-center gap-3">
+            <CreditsBadge />
+            <AppNavMenu isAdmin={session.user.role === "admin"} />
           </div>
         </div>
       </nav>

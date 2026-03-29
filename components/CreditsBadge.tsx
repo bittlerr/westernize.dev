@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
+import { UpgradeDialog } from "@/components/UpgradeDialog";
 import { authClient } from "@/lib/auth-client";
 
 export function CreditsBadge() {
   const { data: session } = authClient.useSession();
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   if (!session) return null;
 
@@ -13,21 +15,24 @@ export function CreditsBadge() {
   const isLow = !isLifetime && credits <= 1;
 
   return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className={isLow ? "text-red" : "text-muted"}>
-        {isLifetime ? (
-          <span className="text-green-400">Unlimited</span>
-        ) : (
-          <>
-            {credits} credit{credits !== 1 ? "s" : ""}
-          </>
+    <>
+      <div className="flex items-center gap-2 text-sm">
+        <span className={isLow ? "text-red" : "text-muted"}>
+          {isLifetime ? (
+            <span className="text-green-400">Unlimited</span>
+          ) : (
+            <>
+              {credits} credit{credits !== 1 ? "s" : ""}
+            </>
+          )}
+        </span>
+        {isLow && (
+          <button type="button" onClick={() => setShowUpgrade(true)} className="text-xs text-red hover:underline">
+            Buy more
+          </button>
         )}
-      </span>
-      {isLow && (
-        <Link href="/#pricing" className="text-xs text-red hover:underline">
-          Buy more
-        </Link>
-      )}
-    </div>
+      </div>
+      <UpgradeDialog open={showUpgrade} onClose={() => setShowUpgrade(false)} />
+    </>
   );
 }

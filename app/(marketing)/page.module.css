@@ -266,7 +266,7 @@
 
 .label {
   font-family: var(--font-unbounded), sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--red);
@@ -302,9 +302,9 @@
 }
 
 .sectionSub {
-  font-size: 16px;
+  font-size: 18px;
   color: var(--muted);
-  max-width: 460px;
+  max-width: 500px;
   line-height: 1.75;
   margin-bottom: 64px;
 }
@@ -332,7 +332,7 @@
 .baTag {
   display: inline-block;
   font-family: var(--font-unbounded), sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   padding: 5px 12px;
@@ -355,14 +355,14 @@
 
 .baRole {
   font-family: var(--font-unbounded), sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.02em;
   margin-bottom: 12px;
 }
 
 .baBullet {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.7;
   padding-left: 16px;
   position: relative;
@@ -400,7 +400,7 @@
 
 .scoreBarLabel {
   font-family: var(--font-unbounded), sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--muted);
@@ -467,7 +467,7 @@
 
 .problemCardTitle {
   font-family: var(--font-unbounded), sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
   margin-bottom: 14px;
@@ -475,7 +475,7 @@
 }
 
 .problemCardText {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--muted);
   line-height: 1.7;
 }
@@ -516,17 +516,17 @@
 
 .stepTitle {
   font-family: var(--font-unbounded), sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
   margin-bottom: 8px;
 }
 
 .stepText {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--muted);
   line-height: 1.65;
-  max-width: 480px;
+  max-width: 520px;
 }
 
 .stepArrow {
@@ -553,16 +553,16 @@
 
 .numberBig {
   font-family: var(--font-unbounded), sans-serif;
-  font-size: clamp(36px, 4vw, 56px);
+  font-size: clamp(40px, 5vw, 64px);
   font-weight: 900;
   color: var(--red);
   letter-spacing: -0.04em;
   line-height: 1;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .numberLabel {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted);
   line-height: 1.5;
 }
@@ -589,7 +589,7 @@
 .testiQuote {
   font-family: var(--font-lora), serif;
   font-style: italic;
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1.75;
   margin-bottom: 28px;
 }
@@ -856,7 +856,7 @@
   }
 
   .sectionSub {
-    font-size: 14px;
+    font-size: 15px;
     margin-bottom: 40px;
   }
 
@@ -887,10 +887,10 @@
     font-size: 28px;
   }
   .stepTitle {
-    font-size: 14px;
+    font-size: 15px;
   }
   .stepText {
-    font-size: 13px;
+    font-size: 14px;
   }
   .stepArrow {
     display: none;
@@ -907,7 +907,7 @@
     padding: 24px;
   }
   .testiQuote {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .plan,

@@ -15,36 +15,59 @@ export async function POST(request: Request) {
   const payload = JSON.parse(rawBody);
   const eventName = payload.meta?.event_name;
 
-  if (eventName !== "order_created") {
+  if (eventName !== "order_created" && eventName !== "order_refunded") {
     return Response.json({ ok: true });
   }
 
+  const customUserId = payload.meta?.custom_data?.user_id as string | undefined;
   const email = payload.data?.attributes?.user_email;
   const variantId = String(payload.data?.attributes?.first_order_item?.variant_id ?? "");
 
-  if (!email) {
-    return Response.json({ error: "No email" }, { status: 400 });
-  }
+  const user = customUserId
+    ? await db
+        .select()
+        .from(users)
+        .where(eq(users.id, customUserId))
+        .then((r) => r[0])
+    : null;
 
-  const user = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email))
-    .then((r) => r[0]);
+  const resolvedUser =
+    user ??
+    (email
+      ? await db
+          .select()
+          .from(users)
+          .where(eq(users.email, email))
+          .then((r) => r[0])
+      : null);
 
-  if (!user) {
+  if (!resolvedUser) {
     return Response.json({ error: "User not found" }, { status: 404 });
   }
 
   const credits = VARIANT_CREDITS[variantId];
 
-  if (typeof credits === "number") {
+  if (typeof credits !== "number") {
+    return Response.json({ ok: true });
+  }
+
+  if (eventName === "order_created") {
     await db
       .update(users)
       .set({ credits: sql`${users.credits} + ${credits}` })
-      .where(eq(users.id, user.id));
+      .where(eq(users.id, resolvedUser.id));
 
-    await logAudit(user.id, "credits.purchased", {
+    await logAudit(resolvedUser.id, "credits.purchased", {
+      amount: credits,
+      variantId,
+    });
+  } else {
+    await db
+      .update(users)
+      .set({ credits: sql`GREATEST(${users.credits} - ${credits}, 0)` })
+      .where(eq(users.id, resolvedUser.id));
+
+    await logAudit(resolvedUser.id, "credits.refunded", {
       amount: credits,
       variantId,
     });

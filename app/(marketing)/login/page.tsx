@@ -58,14 +58,9 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="password" className="block text-sm font-medium">
-                Password
-              </label>
-              <Link href="/forgot-password" className="text-xs text-muted hover:text-red transition-colors">
-                Forgot password?
-              </Link>
-            </div>
+            <label htmlFor="password" className="block text-sm font-medium mb-1.5">
+              Password
+            </label>
             <input
               id="password"
               type="password"
@@ -84,6 +79,12 @@ export default function LoginPage() {
           >
             {loading ? "Logging in..." : "Log in"}
           </button>
+
+          <div className="text-right">
+            <Link href="/forgot-password" className="text-xs text-muted hover:text-red transition-colors">
+              Forgot password?
+            </Link>
+          </div>
         </form>
 
         <p className="text-center text-sm text-muted">
