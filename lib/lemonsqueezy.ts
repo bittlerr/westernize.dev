@@ -37,11 +37,9 @@ export async function createCheckout(variantId: string, userId: string, email: s
     },
   });
 
-  if (error) {
-    console.dir(error.cause, { depth: null });
-
-    throw new Error(`Lemon Squeezy checkout failed: ${error.message}`);
+  if (error || !data) {
+    throw new Error(`Lemon Squeezy checkout failed: ${error?.message || "Unknown error"}`);
   }
 
-  return data!.data.attributes.url;
+  return data.data.attributes.url;
 }

@@ -161,7 +161,10 @@ export function CvDocument({ cvParsed, experienceEntries }: Props) {
             {i > 0 && <View style={s.expDivider} />}
             <View style={s.expTitleRow}>
               <Text style={s.expTitle}>{exp.title}</Text>
-              <Text style={s.expCompany}> {" — "} {exp.company}</Text>
+              <Text style={s.expCompany}>
+                {" "}
+                {" — "} {exp.company}
+              </Text>
             </View>
             <Text style={s.expDates}>{exp.dates}</Text>
             {bullets.map((bullet, j) => (
@@ -178,7 +181,7 @@ export function CvDocument({ cvParsed, experienceEntries }: Props) {
           <View key={i} style={s.eduEntry}>
             <View style={s.expTitleRow}>
               <Text style={s.eduDegree}>{edu.degree}</Text>
-              <Text style={s.eduSchool}>{" "}— {edu.school}</Text>
+              <Text style={s.eduSchool}> — {edu.school}</Text>
             </View>
             <Text style={s.expDates}>{edu.year}</Text>
           </View>

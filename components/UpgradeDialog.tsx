@@ -84,6 +84,7 @@ export function UpgradeDialog({ open, onClose }: { open: boolean; onClose: () =>
         <div className="space-y-3">
           {PACKS.map((pack) => (
             <button
+              type="button"
               key={pack.id}
               onClick={() => handleBuy(pack.id)}
               disabled={loading !== null}

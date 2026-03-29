@@ -1,4 +1,4 @@
-import { and, avg, count, desc, eq, gte, isNotNull } from "drizzle-orm";
+import { avg, count, desc, eq, gte, isNotNull } from "drizzle-orm";
 import { auditLogs, optimizations, users } from "@/db/schema";
 import { formatDateTime, oneWeekAgo } from "@/lib/dates";
 import { db } from "@/lib/db";

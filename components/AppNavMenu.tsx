@@ -12,6 +12,7 @@ export function AppNavMenu({ isAdmin }: { isAdmin: boolean }) {
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen(!open)}
         className="text-muted hover:text-foreground transition-colors p-1"
         aria-label="Menu"
@@ -20,9 +21,7 @@ export function AppNavMenu({ isAdmin }: { isAdmin: boolean }) {
           {open ? (
             <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           ) : (
-            <>
-              <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </>
+            <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           )}
         </svg>
       </button>
@@ -54,6 +53,7 @@ export function AppNavMenu({ isAdmin }: { isAdmin: boolean }) {
             )}
             <div className="h-px bg-border my-1" />
             <button
+              type="button"
               onClick={async () => {
                 await authClient.signOut();
                 router.push("/login");

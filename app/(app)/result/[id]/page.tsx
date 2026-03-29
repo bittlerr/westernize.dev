@@ -32,13 +32,13 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
   const rewrites = row.rewrites as Rewrites;
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-10">
-      <h1 className="font-display text-2xl font-bold mb-8">Optimization Result</h1>
+    <div className="mx-auto max-w-4xl px-4 md:px-6 py-6 md:py-10">
+      <h1 className="font-display text-xl md:text-2xl font-bold mb-6 md:mb-8">Optimization Result</h1>
 
-      <div className="space-y-10">
-        <div className="flex items-start gap-10">
+      <div className="space-y-8 md:space-y-10">
+        <div className="flex flex-col items-center md:flex-row md:items-start gap-6 md:gap-10">
           <ScoreCard score={row.matchScore ?? 0} />
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             <GapAnalysis data={gapAnalysis} />
           </div>
         </div>

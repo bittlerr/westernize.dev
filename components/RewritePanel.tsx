@@ -79,10 +79,10 @@ export function RewritePanel({
             key={i}
             className={`border rounded-lg p-4 transition-colors ${
               bullet.status === "accepted" || bullet.status === "edited"
-                ? "border-green-500/30 bg-green-500/5"
+                ? "border-green-border bg-green-dim"
                 : bullet.status === "rejected"
-                  ? "border-red/30 bg-red/5"
-                  : "border-border"
+                  ? "border-red/40 bg-red/10"
+                  : "border-border bg-bg2"
             }`}
           >
             <div className="grid grid-cols-2 gap-4">
@@ -97,13 +97,13 @@ export function RewritePanel({
               <div>
                 <p className="text-xs text-muted mb-1">
                   Rewritten
-                  {bullet.status === "edited" && <span className="ml-1 text-green-400">(edited)</span>}
+                  {bullet.status === "edited" && <span className="ml-1 text-green">(edited)</span>}
                 </p>
                 {editingIndex === i ? (
                   <textarea
                     value={bullet.editedText}
                     onChange={(e) => update(i, { editedText: e.target.value })}
-                    className="w-full text-sm bg-bg2 border border-border rounded px-2 py-1 outline-none focus:border-red resize-none"
+                    className="w-full text-sm bg-bg border border-border rounded px-2 py-1 outline-none focus:border-red resize-none"
                     rows={3}
                   />
                 ) : (
@@ -125,7 +125,7 @@ export function RewritePanel({
                       update(i, { status: "edited" });
                       setEditingIndex(null);
                     }}
-                    className="text-xs px-3 py-1 rounded bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
+                    className="text-xs px-3 py-1 rounded bg-green-dim text-green hover:opacity-80 transition-colors"
                   >
                     Save
                   </button>
@@ -150,7 +150,7 @@ export function RewritePanel({
                     <button
                       type="button"
                       onClick={() => update(i, { status: "accepted" })}
-                      className="text-xs px-3 py-1.5 rounded border border-green-500/30 text-green-400 hover:bg-green-500/10 transition-colors"
+                      className="text-xs px-3 py-1.5 rounded border border-green-border text-green hover:bg-green-dim transition-colors"
                     >
                       Accept
                     </button>
@@ -164,7 +164,7 @@ export function RewritePanel({
                     <button
                       type="button"
                       onClick={() => update(i, { status: "rejected" })}
-                      className="text-xs px-3 py-1.5 rounded border border-red/30 text-red hover:bg-red/10 transition-colors"
+                      className="text-xs px-3 py-1.5 rounded border border-red/40 text-red hover:bg-red/10 transition-colors"
                     >
                       Reject
                     </button>

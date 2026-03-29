@@ -53,6 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           {/* Mobile nav */}
           <div className="flex md:hidden items-center gap-3">
             <CreditsBadge />
+            <ThemeToggle />
             <AppNavMenu isAdmin={session.user.role === "admin"} />
           </div>
         </div>
