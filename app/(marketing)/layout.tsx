@@ -16,21 +16,18 @@ export default async function MarketingLayout({ children }: { children: React.Re
             WESTERNIZE
           </Link>
           <div className="flex items-center gap-3 md:gap-6">
-            <Link href="/#how" className="text-sm text-muted hover:text-foreground transition-colors hidden md:block">
+            <a href="/#how" className="text-sm text-muted hover:text-foreground transition-colors hidden md:block">
               How it works
-            </Link>
-            <Link
-              href="/#pricing"
-              className="text-sm text-muted hover:text-foreground transition-colors hidden md:block"
-            >
+            </a>
+            <a href="/#pricing" className="text-sm text-muted hover:text-foreground transition-colors hidden md:block">
               Pricing
-            </Link>
-            <Link
+            </a>
+            <a
               href="/#testimonials"
               className="text-sm text-muted hover:text-foreground transition-colors hidden md:block"
             >
               Testimonials
-            </Link>
+            </a>
             <Link href="/blog" className="text-sm text-muted hover:text-foreground transition-colors hidden md:block">
               Blog
             </Link>
