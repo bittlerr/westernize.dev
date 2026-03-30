@@ -1,4 +1,4 @@
-import { PDFParse } from "pdf-parse";
+import { PDFDocument } from "pdf-lib";
 
 const PDF_MAGIC = Buffer.from([0x25, 0x50, 0x44, 0x46]); // %PDF
 
@@ -24,19 +24,17 @@ export async function validatePdf(
     };
   }
 
-  const pdf = new PDFParse({ data: new Uint8Array(buffer) });
-  const info = await pdf.getInfo();
-
-  await pdf.destroy();
+  const pdf = await PDFDocument.load(new Uint8Array(buffer));
+  const pageCount = pdf.getPageCount();
 
   const maxPages = isPaid ? PAID_MAX_PAGES : FREE_MAX_PAGES;
 
-  if (info.total > maxPages) {
+  if (pageCount > maxPages) {
     return {
       valid: false,
       error: `PDF exceeds ${maxPages} page limit`,
     };
   }
 
-  return { valid: true, pageCount: info.total };
+  return { valid: true, pageCount };
 }
