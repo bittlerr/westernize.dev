@@ -23,7 +23,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!post) return {};
 
-  return { title: post.title, description: post.description };
+  return {
+    title: post.title,
+    description: post.description,
+    alternates: { canonical: `/blog/${slug}` },
+  };
 }
 
 export default async function BlogPost({ params }: { params: Promise<Params> }) {

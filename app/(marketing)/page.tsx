@@ -16,6 +16,7 @@ export const metadata = {
   title: "Westernize — Your CV. Rebuilt. Westernized.",
   description:
     "Upload your CV and job description. Get a match score, gap analysis, and AI-rewritten bullet points optimized for Western tech companies.",
+  alternates: { canonical: "/" },
 };
 
 export default async function LandingPage() {
