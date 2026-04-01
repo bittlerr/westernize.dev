@@ -42,25 +42,55 @@ export default async function BlogPost({ params }: { params: Promise<Params> }) 
 
   const Content = mdx.default;
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    author: { "@type": "Organization", name: "Westernize", url: "https://www.westernize.dev" },
+    publisher: {
+      "@type": "Organization",
+      name: "Westernize",
+      url: "https://www.westernize.dev",
+      logo: { "@type": "ImageObject", url: "https://www.westernize.dev/icon.svg" },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `https://www.westernize.dev/blog/${slug}` },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.westernize.dev" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://www.westernize.dev/blog" },
+      { "@type": "ListItem", position: 3, name: post.title, item: `https://www.westernize.dev/blog/${slug}` },
+    ],
+  };
+
   return (
-    <div className="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-24">
-      <Link href="/blog" className="text-sm text-muted hover:text-foreground transition-colors mb-8 inline-block">
-        &larr; Back to blog
-      </Link>
-      <time className="block text-sm text-muted mb-2">{post.date}</time>
-      <h1 className="font-display text-3xl md:text-4xl font-bold mb-8">{post.title}</h1>
-      <article>
-        <Content />
-      </article>
-      <div className="mt-16 pt-8 border-t border-border">
-        <p className="text-muted mb-4">Ready to westernize your CV?</p>
-        <Link
-          href="/signup"
-          className="inline-block bg-red text-white px-6 py-3 rounded-lg hover:bg-red/90 transition-colors font-semibold"
-        >
-          Try Westernize for free &rarr;
+    <>
+      <script type="application/ld+json">{JSON.stringify(articleJsonLd)}</script>
+      <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
+      <div className="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-24">
+        <Link href="/blog" className="text-sm text-muted hover:text-foreground transition-colors mb-8 inline-block">
+          &larr; Back to blog
         </Link>
+        <time className="block text-sm text-muted mb-2">{post.date}</time>
+        <h1 className="font-display text-3xl md:text-4xl font-bold mb-8">{post.title}</h1>
+        <article>
+          <Content />
+        </article>
+        <div className="mt-16 pt-8 border-t border-border">
+          <p className="text-muted mb-4">Ready to westernize your CV?</p>
+          <Link
+            href="/signup"
+            className="inline-block bg-red text-white px-6 py-3 rounded-lg hover:bg-red/90 transition-colors font-semibold"
+          >
+            Try Westernize for free &rarr;
+          </Link>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

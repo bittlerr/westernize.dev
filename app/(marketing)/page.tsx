@@ -66,6 +66,51 @@ export default async function LandingPage() {
           },
         ],
       },
+      {
+        "@type": "FAQPage",
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: "Why is my CV getting filtered by ATS systems?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "ATS (Applicant Tracking Systems) scan for specific keywords that match the job description. Eastern European CVs often use slightly different phrasing for the same skills and experience, causing automatic rejection before a human ever sees your application.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Why does passive voice hurt my CV when applying to Western companies?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Phrases like 'Responsible for' and 'worked with' signal junior-level thinking in Western hiring culture, regardless of your actual seniority. Western tech companies expect action-oriented, quantified language — for example, 'Led a team of 4 engineers' instead of 'Was responsible for team coordination'.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Why don't regular CV tools work for Eastern European developers?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Most CV optimization tools are designed for US candidates. They don't understand Eastern European education systems, career paths, or what 'senior' means in different countries. Westernize is built specifically for developers from Eastern Europe targeting Western tech companies.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "How does Westernize optimize my CV?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Upload your CV and the job description. Westernize scores your CV against the job requirements, identifies missing keywords and skills, flags weak bullet points, and rewrites them with action-oriented, quantified language optimized for Western tech companies. The whole process takes under 5 minutes.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Is Westernize free to use?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Yes, you get 3 free CV optimizations with no credit card required. Each optimization includes an ATS match score, gap analysis, bullet-by-bullet rewrite, and DOCX + PDF export. Paid packs start at $12 for 5 optimizations.",
+            },
+          },
+        ],
+      },
     ],
   };
 

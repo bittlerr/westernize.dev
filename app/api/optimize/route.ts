@@ -135,7 +135,7 @@ export async function POST(request: Request) {
             claude.messages.parse({
               model: MODEL,
               max_tokens: 4096,
-              system: "You are a CV parser. Extract structured data from the CV. Be thorough and accurate.",
+              system: "You are a CV parser. Extract structured data from the CV. " + "Be thorough and accurate.",
               messages: [{ role: "user", content: cvContent }],
               output_config: { format: zodOutputFormat(CvParsedSchema) },
             }),
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
             claude.messages.parse({
               model: MODEL,
               max_tokens: 2048,
-              system: "You are a job description parser. Extract structured requirements from the job posting.",
+              system: "You are a job description parser. " + "Extract structured requirements from the job posting.",
               messages: [{ role: "user", content: jdText }],
               output_config: { format: zodOutputFormat(JdParsedSchema) },
             }),
@@ -167,12 +167,36 @@ export async function POST(request: Request) {
           claude.messages.parse({
             model: MODEL,
             max_tokens: 4096,
-            system:
-              "You are a CV-to-job-description gap analyzer. Compare the parsed CV against the job requirements. Score the match 0-100, identify missing keywords, missing skills, weak bullet points, and strengths. Provide a concise summary.",
+            system: [
+              "You are a CV-to-job-description gap analyzer.",
+              "Compare the parsed CV against the job requirements.",
+              "",
+              "Scoring rules for match_score (0-100):",
+              "- 90-100: Candidate meets ALL required skills with strong evidence,",
+              "  plus most preferred skills.",
+              "- 75-89: Candidate meets most required skills with evidence,",
+              "  some preferred skills present.",
+              "- 60-74: Candidate meets some required skills but has notable gaps",
+              "  in required or preferred areas.",
+              "- 40-59: Candidate has relevant experience but is missing multiple",
+              "  required skills.",
+              "- 0-39: Candidate has minimal alignment with the job requirements.",
+              "",
+              "Score based on EVIDENCE in the CV — skills listed, demonstrated",
+              "in bullet points, years of experience. Do not infer skills that",
+              "are not mentioned. Weight required skills more heavily than",
+              "preferred skills. Be precise and avoid defaulting to a safe",
+              "middle score.",
+              "",
+              "Also identify missing keywords, missing skills, weak bullet",
+              "points, and strengths. Provide a concise summary.",
+            ].join("\n"),
             messages: [
               {
                 role: "user",
-                content: `CV:\n${JSON.stringify(cvParsed)}\n\nJob Description:\n${JSON.stringify(jdParsed)}`,
+                content: [`CV:\n${JSON.stringify(cvParsed)}`, `Job Description:\n${JSON.stringify(jdParsed)}`].join(
+                  "\n\n",
+                ),
               },
             ],
             output_config: { format: zodOutputFormat(GapAnalysisSchema) },
@@ -196,12 +220,27 @@ export async function POST(request: Request) {
           claude.messages.parse({
             model: MODEL,
             max_tokens: 4096,
-            system:
-              "You are a CV bullet point rewriter specializing in Western tech company standards. Rewrite weak bullet points to be action-oriented, quantified where possible, and aligned with the job requirements. Use strong active verbs. Westernize the language — remove passive voice, vague descriptions, and Eastern European CV conventions.",
+            system: [
+              "You are a CV bullet point rewriter specializing in Western",
+              "tech company standards. You will receive ALL bullet points",
+              "from the CV, the job requirements, and a list of bullets",
+              "flagged as weak. Rewrite EVERY bullet — not just the weak",
+              "ones — to be action-oriented, quantified where possible,",
+              "and aligned with the job requirements. Use strong active",
+              "verbs. Westernize the language — remove passive voice,",
+              "vague descriptions, and Eastern European CV conventions.",
+              "Weak bullets need heavier rewrites; strong bullets may",
+              "only need minor polishing.",
+            ].join(" "),
             messages: [
               {
                 role: "user",
-                content: `CV bullets to rewrite:\n${JSON.stringify(cvParsed?.experience)}\n\nJob requirements:\n${JSON.stringify(jdParsed)}\n\nGap analysis:\n${JSON.stringify(gapAnalysis)}`,
+                content: [
+                  `All CV experience:\n${JSON.stringify(cvParsed?.experience)}`,
+                  `Job requirements:\n${JSON.stringify(jdParsed)}`,
+                  `Bullets flagged as weak:\n${JSON.stringify(gapAnalysis?.weak_bullets)}`,
+                  `Missing skills/keywords to weave in where truthful:\n${JSON.stringify(gapAnalysis?.missing_keywords)}`,
+                ].join("\n\n"),
               },
             ],
             output_config: { format: zodOutputFormat(RewritesSchema) },

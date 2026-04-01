@@ -159,6 +159,7 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
           } else if (event.step === "error") {
             finished = true;
             setCurrentStep(null);
+            setLoading(false);
             toast.error(event.message);
           } else {
             setCurrentStep(event.step);
@@ -172,10 +173,10 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
       if (!finished) {
         toast.error("Connection lost. Please try again.");
         setCurrentStep(null);
+        setLoading(false);
       }
     } catch {
       toast.error("Connection error. Please try again.");
-    } finally {
       setLoading(false);
     }
   }
