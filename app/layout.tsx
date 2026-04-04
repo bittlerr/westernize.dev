@@ -43,6 +43,11 @@ export const metadata: Metadata = {
     title: "Westernize — Rebuild your CV for Western tech",
     description: "AI-powered CV optimization for Eastern European devs targeting Western tech companies.",
   },
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
+  },
   robots: {
     index: true,
     follow: true,

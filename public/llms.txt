@@ -1,0 +1,35 @@
+# Westernize
+
+> AI-powered CV optimization for Eastern European developers targeting Western tech companies.
+
+## What is Westernize?
+
+Westernize is a web tool that helps Eastern European software developers rewrite their CVs for Western tech companies. Upload your CV and a job description, and Westernize will:
+
+- Score your CV against the job requirements (ATS match score)
+- Identify missing keywords and skills (gap analysis)
+- Flag weak or passive bullet points
+- Rewrite every bullet point with action-oriented, quantified language
+- Export the optimized CV as DOCX or PDF
+
+## Who is it for?
+
+Developers from Eastern Europe (Romania, Moldova, Ukraine, Poland, Bulgaria, etc.) who are applying to remote positions at Western tech companies (US, UK, EU). It solves the specific problem of CVs that use phrasing and conventions that Western ATS systems and recruiters don't recognize.
+
+## How it works
+
+1. Upload your CV (paste text or upload PDF)
+2. Paste the job description
+3. Get a match score, gap analysis, and AI-rewritten bullet points in under 5 minutes
+
+## Pricing
+
+- Free: 3 CV optimizations, no credit card required
+- Starter Pack: $12 for 5 optimizations
+- Hunt Pack: $49 for 50 optimizations
+
+## Links
+
+- Website: https://www.westernize.dev
+- Sign up: https://www.westernize.dev/signup
+- Blog: https://www.westernize.dev/blog

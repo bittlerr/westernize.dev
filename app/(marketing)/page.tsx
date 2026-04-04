@@ -67,6 +67,17 @@ export default async function LandingPage() {
         ],
       },
       {
+        "@type": "WebSite",
+        name: "Westernize",
+        url: "https://www.westernize.dev",
+        description:
+          "AI-powered CV optimization for Eastern European developers targeting Western tech companies.",
+        potentialAction: {
+          "@type": "ReadAction",
+          target: "https://www.westernize.dev/blog",
+        },
+      },
+      {
         "@type": "FAQPage",
         mainEntity: [
           {

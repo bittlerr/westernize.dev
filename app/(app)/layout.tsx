@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -5,6 +6,10 @@ import { AppNavMenu } from "@/components/AppNavMenu";
 import { CreditsBadge } from "@/components/CreditsBadge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { auth } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth.api.getSession({

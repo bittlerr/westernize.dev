@@ -3,6 +3,8 @@ export interface Post {
   title: string;
   description: string;
   date: string;
+  updated?: string;
+  author?: string;
 }
 
 export const posts: Post[] = [
@@ -11,19 +13,21 @@ export const posts: Post[] = [
     title: "Why Eastern European Developers Don't Get Callbacks",
     description:
       "You have the skills. You have the experience. But your CV speaks a language Western recruiters don't understand. Here's what's going wrong — and how to fix it.",
-    date: "2026-01-15",
+    date: "2026-01-15T09:14:00Z",
+    updated: "2026-03-10T14:22:00Z",
   },
   {
     slug: "ats-keywords-developers-2026",
     title: "ATS Keywords Every Developer Needs in 2026",
     description: "The exact keywords Western tech companies filter for — and why your CV is probably missing them.",
-    date: "2026-02-20",
+    date: "2026-02-20T16:42:00Z",
+    updated: "2026-03-25T10:08:00Z",
   },
   {
     slug: "how-to-write-cv-for-remote-western-jobs",
     title: "How to Write a CV for Remote Jobs at Western Companies",
     description:
       "A step-by-step guide to restructuring your CV for the companies that are actually hiring remotely from Eastern Europe.",
-    date: "2026-03-28",
+    date: "2026-03-28T11:37:00Z",
   },
 ];
