@@ -8,7 +8,6 @@ import { auth } from "@/lib/auth";
 import { claude, MODEL } from "@/lib/claude";
 import { deductCredit, hasCredit } from "@/lib/credits";
 import { db } from "@/lib/db";
-import { checkRateLimit } from "@/lib/rate-limit";
 import type { SSEEvent } from "@/types";
 import {
   type CvParsed,
@@ -66,18 +65,14 @@ export async function POST(request: Request) {
   }
 
   const userId = session.user.id;
-  const isPaid = session.user.isLifetime || session.user.credits > 1;
+  const isAdmin = session.user.role === "admin";
 
-  const rateCheck = await checkRateLimit(userId, isPaid);
+  if (!isAdmin) {
+    const creditCheck = await hasCredit(userId);
 
-  if (!rateCheck.allowed) {
-    return Response.json({ error: rateCheck.error }, { status: 429 });
-  }
-
-  const creditCheck = await hasCredit(userId);
-
-  if (!creditCheck) {
-    return Response.json({ error: "No credits remaining" }, { status: 402 });
+    if (!creditCheck) {
+      return Response.json({ error: "No credits remaining" }, { status: 402 });
+    }
   }
 
   const body = await request.json();
@@ -250,8 +245,8 @@ export async function POST(request: Request) {
         trackTokens(rewriteResult.usage);
         rewrites = rewriteResult.parsed_output as unknown as Rewrites;
 
-        // Deduct credit on success
-        await deductCredit(userId);
+        // Deduct credit on success (admins bypass)
+        if (!isAdmin) await deductCredit(userId);
 
         await db
           .update(optimizations)

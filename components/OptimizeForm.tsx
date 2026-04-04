@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
+import { authClient } from "@/lib/auth-client";
 import type { OptimizationResult, SSEEvent } from "@/types";
 
 const STEPS = [
@@ -14,6 +15,7 @@ const STEPS = [
 type InputMode = "paste" | "upload";
 
 export function OptimizeForm({ onComplete }: { onComplete: (result: OptimizationResult) => void }) {
+  const { refetch: refetchSession } = authClient.useSession();
   const [cvText, setCvText] = useState("");
   const [jdText, setJdText] = useState("");
   const [inputMode, setInputMode] = useState<InputMode>("paste");
@@ -155,6 +157,7 @@ export function OptimizeForm({ onComplete }: { onComplete: (result: Optimization
 
           if (event.step === "done") {
             finished = true;
+            refetchSession();
             onComplete(event.result);
           } else if (event.step === "error") {
             finished = true;
