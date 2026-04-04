@@ -225,7 +225,9 @@ export async function POST(request: Request) {
               "verbs. Westernize the language — remove passive voice,",
               "vague descriptions, and Eastern European CV conventions.",
               "Weak bullets need heavier rewrites; strong bullets may",
-              "only need minor polishing.",
+              "only need minor polishing. NEVER add version numbers",
+              "(e.g. React 18, Next.js 14, Angular 2+) unless the",
+              "original bullet explicitly mentions that version.",
             ].join(" "),
             messages: [
               {
