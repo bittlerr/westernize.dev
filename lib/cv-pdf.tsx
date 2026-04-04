@@ -99,6 +99,11 @@ const s = StyleSheet.create({
     fontSize: 10,
     color: COLOR.accent,
   },
+  expLocation: {
+    fontSize: 10,
+    color: COLOR.muted,
+    fontStyle: "italic",
+  },
   expDates: {
     fontSize: 8,
     color: COLOR.muted,
@@ -136,6 +141,25 @@ const s = StyleSheet.create({
   },
 });
 
+function buildContactParts(cv: CvParsed): string[] {
+  const parts: string[] = [];
+
+  if (cv.email) parts.push(cv.email);
+  if (cv.phone) parts.push(cv.phone);
+  if (cv.location) parts.push(cv.location);
+  if (cv.linkedin) parts.push(shortenLinkedIn(cv.linkedin));
+  if (cv.github) parts.push(cv.github);
+  if (cv.website) parts.push(cv.website);
+
+  return parts;
+}
+
+function shortenLinkedIn(url: string): string {
+  const match = url.match(/linkedin\.com\/in\/([^/?#]+)/);
+
+  return match ? `in/${match[1]}` : url;
+}
+
 interface Props {
   cvParsed: CvParsed;
   experienceEntries: { exp: CvParsed["experience"][number]; bullets: string[] }[];
@@ -146,7 +170,7 @@ export function CvDocument({ cvParsed, experienceEntries }: Props) {
     <Document>
       <Page size="A4" style={s.page}>
         <Text style={s.name}>{cvParsed.name}</Text>
-        <Text style={s.email}>{cvParsed.email}</Text>
+        <Text style={s.email}>{buildContactParts(cvParsed).join("  ·  ")}</Text>
         <View style={s.accentLine} />
 
         <Text style={s.sectionHeading}>Professional Summary</Text>
@@ -160,10 +184,18 @@ export function CvDocument({ cvParsed, experienceEntries }: Props) {
           <View key={i} style={s.expEntry}>
             {i > 0 && <View style={s.expDivider} />}
             <View style={s.expTitleRow}>
-              <Text style={s.expTitle}>{exp.title}</Text>
-              <Text style={s.expCompany}>
-                {" "}
-                {" — "} {exp.company}
+              <Text>
+                <Text style={s.expTitle}>{exp.title}</Text>
+                <Text style={s.expCompany}>
+                  {" — "}
+                  {exp.company}
+                </Text>
+                {exp.location && (
+                  <Text style={s.expLocation}>
+                    {" · "}
+                    {exp.location}
+                  </Text>
+                )}
               </Text>
             </View>
             <Text style={s.expDates}>{exp.dates}</Text>

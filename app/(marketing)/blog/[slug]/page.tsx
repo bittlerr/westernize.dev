@@ -72,12 +72,42 @@ export default async function BlogPost({ params }: { params: Promise<Params> }) 
           name: post.title,
           description: post.description,
           step: [
-            { "@type": "HowToStep", position: 1, name: "Fix the format", text: "Follow the Western CV structure: name, summary, experience, skills, education. Drop photos, date of birth, and marital status." },
-            { "@type": "HowToStep", position: 2, name: "Write a professional summary", text: "Communicate what you do, how long you've done it, and what makes you relevant for the role in 2-3 sentences." },
-            { "@type": "HowToStep", position: 3, name: "Rewrite every bullet point", text: "Use the formula: strong verb + what you did + scale/context + measurable result." },
-            { "@type": "HowToStep", position: 4, name: "Optimize for ATS", text: "Match keywords from the job description. Use the same phrasing. Ensure each keyword appears at least once in an experience bullet." },
-            { "@type": "HowToStep", position: 5, name: "Add remote-specific signals", text: "Mention async collaboration, time zone experience, and tools like Slack, Notion, Linear, and GitHub." },
-            { "@type": "HowToStep", position: 6, name: "Update LinkedIn", text: "Mirror your CV headline, summary, and keyword-rich bullets on your LinkedIn profile." },
+            {
+              "@type": "HowToStep",
+              position: 1,
+              name: "Fix the format",
+              text: "Follow the Western CV structure: name, summary, experience, skills, education. Drop photos, date of birth, and marital status.",
+            },
+            {
+              "@type": "HowToStep",
+              position: 2,
+              name: "Write a professional summary",
+              text: "Communicate what you do, how long you've done it, and what makes you relevant for the role in 2-3 sentences.",
+            },
+            {
+              "@type": "HowToStep",
+              position: 3,
+              name: "Rewrite every bullet point",
+              text: "Use the formula: strong verb + what you did + scale/context + measurable result.",
+            },
+            {
+              "@type": "HowToStep",
+              position: 4,
+              name: "Optimize for ATS",
+              text: "Match keywords from the job description. Use the same phrasing. Ensure each keyword appears at least once in an experience bullet.",
+            },
+            {
+              "@type": "HowToStep",
+              position: 5,
+              name: "Add remote-specific signals",
+              text: "Mention async collaboration, time zone experience, and tools like Slack, Notion, Linear, and GitHub.",
+            },
+            {
+              "@type": "HowToStep",
+              position: 6,
+              name: "Update LinkedIn",
+              text: "Mirror your CV headline, summary, and keyword-rich bullets on your LinkedIn profile.",
+            },
           ],
         }
       : null;
@@ -101,7 +131,9 @@ export default async function BlogPost({ params }: { params: Promise<Params> }) 
         <Link href="/blog" className="text-sm text-muted hover:text-foreground transition-colors mb-8 inline-block">
           &larr; Back to blog
         </Link>
-        <time className="block text-sm text-muted mb-2">{new Date(post.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</time>
+        <time className="block text-sm text-muted mb-2">
+          {new Date(post.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+        </time>
         <h1 className="font-display text-3xl md:text-4xl font-bold mb-8">{post.title}</h1>
         <article>
           <Content />

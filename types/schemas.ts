@@ -4,6 +4,11 @@ import { z } from "zod";
 export const CvParsedSchema = z.object({
   name: z.string(),
   email: z.string(),
+  phone: z.string().optional(),
+  location: z.string().optional(),
+  linkedin: z.string().optional(),
+  github: z.string().optional(),
+  website: z.string().optional(),
   summary: z.string(),
   skills: z.array(z.string()),
   experience: z.array(
@@ -11,6 +16,7 @@ export const CvParsedSchema = z.object({
       title: z.string(),
       company: z.string(),
       dates: z.string(),
+      location: z.string().optional(),
       bullets: z.array(z.string()),
     }),
   ),

@@ -49,6 +49,25 @@ function sectionHeading(text: string): Paragraph {
   });
 }
 
+function buildContactParts(cv: CvParsed): string[] {
+  const parts: string[] = [];
+
+  if (cv.email) parts.push(cv.email);
+  if (cv.phone) parts.push(cv.phone);
+  if (cv.location) parts.push(cv.location);
+  if (cv.linkedin) parts.push(shortenLinkedIn(cv.linkedin));
+  if (cv.github) parts.push(cv.github);
+  if (cv.website) parts.push(cv.website);
+
+  return parts;
+}
+
+function shortenLinkedIn(url: string): string {
+  const match = url.match(/linkedin\.com\/in\/([^/?#]+)/);
+
+  return match ? `in/${match[1]}` : url;
+}
+
 interface AcceptedBullet {
   index: number;
   text: string;
@@ -126,18 +145,14 @@ export async function POST(request: Request) {
               }),
             ],
           }),
-          // ── Email ──
+          // ── Contact ──
           new Paragraph({
             spacing: { before: 0, after: 40 },
             alignment: AlignmentType.CENTER,
-            children: [
-              new TextRun({
-                text: cvParsed.email,
-                font: FONT,
-                size: SIZE.small,
-                color: COLOR.accent,
-              }),
-            ],
+            children: buildContactParts(cvParsed).flatMap((val, i) => [
+              ...(i > 0 ? [new TextRun({ text: "  ·  ", font: FONT, size: SIZE.small, color: COLOR.divider })] : []),
+              new TextRun({ text: val, font: FONT, size: SIZE.small, color: COLOR.accent }),
+            ]),
           }),
           // ── Accent divider ──
           new Paragraph({
@@ -221,6 +236,17 @@ export async function POST(request: Request) {
                   size: SIZE.normal,
                   color: COLOR.accent,
                 }),
+                ...(exp.location
+                  ? [
+                      new TextRun({
+                        text: `  ·  ${exp.location}`,
+                        font: FONT,
+                        size: SIZE.small,
+                        color: COLOR.muted,
+                        italics: true,
+                      }),
+                    ]
+                  : []),
               ],
             }),
             // Dates on own line
